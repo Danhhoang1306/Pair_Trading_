@@ -1,0 +1,32 @@
+{
+  "6691542e-cc1c-4966-b5f4-960fd3767097": {
+    "position_id": "6691542e-cc1c-4966-b5f4-960fd3767097",
+    "spread_id": "1611180498-1611180504",
+    "mt5_ticket": 1611180498,
+    "symbol": "BTCUSD",
+    "side": "LONG",
+    "volume": 0.08,
+    "entry_price": 95558.94,
+    "entry_time": "2026-01-16 15:05:53.671123",
+    "entry_zscore": -0.6518745992057877,
+    "hedge_ratio": 25.746108854210682,
+    "is_primary": true,
+    "created_at": "2026-01-16T15:05:53.671123",
+    "last_updated": "2026-01-16T15:05:53.671123"
+  },
+  "5894ddba-b4d8-4624-8026-73b020ca5b9d": {
+    "position_id": "5894ddba-b4d8-4624-8026-73b020ca5b9d",
+    "spread_id": "1611180498-1611180504",
+    "mt5_ticket": 1611180504,
+    "symbol": "ETHUSD",
+    "side": "SHORT",
+    "volume": 2.04,
+    "entry_price": 3308.21,
+    "entry_time": "2026-01-16 15:05:53.671123",
+    "entry_zscore": -0.6518745992057877,
+    "hedge_ratio": 25.746108854210682,
+    "is_primary": false,
+    "created_at": "2026-01-16T15:05:53.680124",
+    "last_updated": "2026-01-16T15:05:53.680124"
+  }
+}

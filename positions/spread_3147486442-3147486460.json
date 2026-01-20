@@ -1,0 +1,17 @@
+{
+  "a2669ecc-48ee-4d4f-b2c8-7c579f317d4a": {
+    "position_id": "a2669ecc-48ee-4d4f-b2c8-7c579f317d4a",
+    "spread_id": "3147486442-3147486460",
+    "mt5_ticket": 3147486442,
+    "symbol": "BTCUSDm",
+    "side": "LONG",
+    "volume": 0.01,
+    "entry_price": 95267.79000000001,
+    "entry_time": "2026-01-14 08:54:19.908177",
+    "entry_zscore": -1.8543510636759146,
+    "hedge_ratio": 25.399802950260863,
+    "is_primary": true,
+    "created_at": "2026-01-14T08:54:19.910175",
+    "last_updated": "2026-01-14T08:54:19.910175"
+  }
+}

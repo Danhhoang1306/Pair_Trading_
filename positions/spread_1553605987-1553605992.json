@@ -1,0 +1,32 @@
+{
+  "be9cd12a-0cf5-4f59-be27-345b71c3946b": {
+    "position_id": "be9cd12a-0cf5-4f59-be27-345b71c3946b",
+    "spread_id": "1553605987-1553605992",
+    "mt5_ticket": 1553605987,
+    "symbol": "XAUUSD",
+    "side": "LONG",
+    "volume": 0.01,
+    "entry_price": 4331.011,
+    "entry_time": "2025-12-31 12:02:00.996593",
+    "entry_zscore": -3.4097900504768317,
+    "hedge_ratio": 0.6767152925724877,
+    "is_primary": true,
+    "created_at": "2025-12-31T12:02:00.997597",
+    "last_updated": "2025-12-31T12:02:00.997597"
+  },
+  "17f59b73-0e1b-4801-8cc6-cd7800e80fb6": {
+    "position_id": "17f59b73-0e1b-4801-8cc6-cd7800e80fb6",
+    "spread_id": "1553605987-1553605992",
+    "mt5_ticket": 1553605992,
+    "symbol": "XAGUSD",
+    "side": "SHORT",
+    "volume": 0.01,
+    "entry_price": 71.602,
+    "entry_time": "2025-12-31 12:02:00.996593",
+    "entry_zscore": -3.4097900504768317,
+    "hedge_ratio": 0.6767152925724877,
+    "is_primary": false,
+    "created_at": "2025-12-31T12:02:01.012000",
+    "last_updated": "2025-12-31T12:02:01.012000"
+  }
+}

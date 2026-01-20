@@ -1,0 +1,17 @@
+{
+  "22fbf197-2f5a-4ca3-9747-d89c2f1359be": {
+    "position_id": "22fbf197-2f5a-4ca3-9747-d89c2f1359be",
+    "spread_id": "1611180341-1611180346",
+    "mt5_ticket": 1611180341,
+    "symbol": "BTCUSD",
+    "side": "LONG",
+    "volume": 0.08,
+    "entry_price": 95561.53,
+    "entry_time": "2026-01-16 15:05:49.587329",
+    "entry_zscore": -0.6484927769707611,
+    "hedge_ratio": 25.746108854210682,
+    "is_primary": true,
+    "created_at": "2026-01-16T15:05:49.588328",
+    "last_updated": "2026-01-16T15:05:49.588328"
+  }
+}

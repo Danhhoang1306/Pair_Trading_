@@ -1,0 +1,163 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pair-trading-pro"
+version = "2.0.0"
+description = "Hệ thống giao dịch cặp (Pair Trading) tự động với MetaTrader 5"
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.8"
+authors = [
+    {name = "Pair Trading Pro Team"}
+]
+keywords = [
+    "trading",
+    "pair-trading",
+    "metatrader5",
+    "mt5",
+    "algorithmic-trading",
+    "quantitative-finance",
+    "statistical-arbitrage"
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Financial and Insurance Industry",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: Microsoft :: Windows",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Office/Business :: Financial :: Investment",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+
+dependencies = [
+    "MetaTrader5>=5.0.45",
+    "PyQt6>=6.4.0",
+    "PyQt6-Charts>=6.4.0",
+    "numpy>=1.24.0",
+    "pandas>=2.0.0",
+    "scipy>=1.10.0",
+    "statsmodels>=0.14.0",
+    "scikit-learn>=1.2.0",
+    "arch>=5.3.0",
+    "PyYAML>=6.0",
+    "python-dotenv>=1.0.0",
+    "colorlog>=6.7.0",
+    "python-dateutil>=2.8.0",
+    "pytz>=2023.3",
+    "requests>=2.31.0",
+    "urllib3>=2.0.0",
+    "pydantic>=2.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.0",
+    "pytest-cov>=4.1.0",
+    "black>=23.0.0",
+    "flake8>=6.0.0",
+    "mypy>=1.4.0",
+    "isort>=5.12.0",
+]
+viz = [
+    "matplotlib>=3.7.0",
+    "seaborn>=0.12.0",
+    "plotly>=5.14.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/your-username/pair-trading-pro"
+Documentation = "https://github.com/your-username/pair-trading-pro#readme"
+Repository = "https://github.com/your-username/pair-trading-pro"
+Issues = "https://github.com/your-username/pair-trading-pro/issues"
+
+[project.scripts]
+pair-trading-gui = "launch_gui:main"
+pair-trading-cli = "main_cli:main"
+pair-trading-indices = "main_indices_cli:main"
+pair-trading-check = "check_startup:main"
+
+[project.gui-scripts]
+pair-trading = "launch_gui:main"
+
+[tool.setuptools]
+packages = [
+    "config",
+    "core",
+    "strategy",
+    "risk",
+    "executors",
+    "analysis",
+    "gui",
+    "handlers",
+    "recovery",
+    "threads",
+    "utils",
+    "models",
+]
+include-package-data = true
+
+[tool.setuptools.package-data]
+"*" = ["*.yaml", "*.yml", "*.json"]
+
+[tool.black]
+line-length = 100
+target-version = ['py38', 'py39', 'py310', 'py311', 'py312']
+include = '\.pyi?$'
+exclude = '''
+/(
+    \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | venv
+  | _build
+  | buck-out
+  | build
+  | dist
+  | __pycache__
+)/
+'''
+
+[tool.isort]
+profile = "black"
+line_length = 100
+skip = [".gitignore", ".dockerignore", "venv", ".venv"]
+
+[tool.mypy]
+python_version = "3.10"
+warn_return_any = true
+warn_unused_configs = true
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+testpaths = ["Test", "tests"]
+python_files = ["test_*.py", "*_test.py"]
+python_functions = ["test_*"]
+addopts = "-v --tb=short"
+filterwarnings = [
+    "ignore::DeprecationWarning",
+    "ignore::PendingDeprecationWarning",
+]
+
+[tool.coverage.run]
+source = ["config", "core", "strategy", "risk", "executors", "utils"]
+omit = ["*/tests/*", "*/__pycache__/*", "*/venv/*"]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+]

@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python -m py_compile:*)",
+      "Bash(venv/Scripts/python.exe:*)",
+      "Bash(set:*)",
+      "Bash(pip show:*)",
+      "Bash(ls:*)",
+      "Bash(findstr:*)",
+      "Bash(grep:*)",
+      "Bash(dir:*)",
+      "Bash(move \"f:\\\\pair_trading_pro\\\\asset\\\\default_config.yaml\" \"f:\\\\pair_trading_pro\\\\asset\\\\config\"\" && move \"f:pair_trading_proassetsymbols_pairs.yaml\" \"f:pair_trading_proassetconfig\"\")",
+      "Bash(pip install:*)",
+      "Bash(tree:*)",
+      "Bash(git init:*)",
+      "Bash(git remote add:*)",
+      "Bash(git add:*)"
+    ]
+  }
+}

@@ -1,0 +1,2 @@
+# This file ensures the state directory exists in git
+# Runtime state files (*.json) are ignored

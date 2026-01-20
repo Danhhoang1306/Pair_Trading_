@@ -1,0 +1,11 @@
+# Ignore runtime state files
+state/*.json
+!state/.gitkeep
+
+# Keep documentation and package files
+!README.md
+!__init__.py
+
+# Python cache
+__pycache__/
+*.pyc
