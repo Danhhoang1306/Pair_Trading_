@@ -266,6 +266,329 @@ Pair trading dựa trên giả định rằng hai tài sản có tương quan s�
 - **pyramiding_executor**: Scale in position
 - **volume_rebalancer**: Điều chỉnh volume để duy trì hedge ratio
 
+## Đóng gói và Phân phối
+
+### Yêu cầu trước khi đóng gói
+
+```bash
+# Cài đặt PyInstaller
+pip install pyinstaller
+
+# Cài đặt các dependencies đầy đủ
+pip install -r requirements.txt
+```
+
+### Tạo file thực thi (.exe)
+
+#### 1. Đóng gói GUI Application
+
+```bash
+# Tạo file .exe cho GUI (khuyến nghị)
+pyinstaller --name="PairTradingPro" ^
+    --onefile ^
+    --windowed ^
+    --icon=asset/icon.ico ^
+    --add-data "config;config" ^
+    --add-data "asset;asset" ^
+    --hidden-import=PyQt6 ^
+    --hidden-import=MetaTrader5 ^
+    --hidden-import=pandas ^
+    --hidden-import=numpy ^
+    launch_gui.py
+
+# Output: dist/PairTradingPro.exe
+```
+
+#### 2. Đóng gói CLI Application
+
+```bash
+# Crypto pairs CLI
+pyinstaller --name="PairTradingCLI" ^
+    --onefile ^
+    --console ^
+    --add-data "config;config" ^
+    --hidden-import=MetaTrader5 ^
+    main_cli.py
+
+# Indices pairs CLI
+pyinstaller --name="PairTradingIndices" ^
+    --onefile ^
+    --console ^
+    --add-data "config;config" ^
+    --hidden-import=MetaTrader5 ^
+    main_indices_cli.py
+```
+
+#### 3. Đóng gói với bảo vệ code (nếu cần)
+
+```bash
+# Sử dụng PyArmor để bảo vệ source code
+pip install pyarmor
+
+# Obfuscate source code
+pyarmor gen --recursive --output dist/obfuscated core/ strategy/ risk/ executors/
+
+# Sau đó build với PyInstaller từ code đã obfuscate
+```
+
+### Tạo Installer cho Windows
+
+#### Sử dụng Inno Setup
+
+1. Tải và cài đặt [Inno Setup](https://jrsoftware.org/isinfo.php)
+
+2. Tạo file script `installer.iss`:
+
+```ini
+[Setup]
+AppName=Pair Trading Pro
+AppVersion=2.0.0
+DefaultDirName={autopf}\PairTradingPro
+DefaultGroupName=Pair Trading Pro
+OutputDir=installer
+OutputBaseFilename=PairTradingPro_Setup_v2.0.0
+Compression=lzma2
+SolidCompression=yes
+ArchitecturesInstallIn64BitMode=x64
+
+[Files]
+Source: "dist\PairTradingPro.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "config\*"; DestDir: "{app}\config"; Flags: ignoreversion recursesubdirs
+Source: "asset\*"; DestDir: "{app}\asset"; Flags: ignoreversion recursesubdirs
+Source: "README.md"; DestDir: "{app}"; Flags: ignoreversion
+Source: "LICENSE"; DestDir: "{app}"; Flags: ignoreversion
+Source: ".env.example"; DestDir: "{app}"; Flags: ignoreversion
+
+[Icons]
+Name: "{group}\Pair Trading Pro"; Filename: "{app}\PairTradingPro.exe"
+Name: "{group}\Uninstall"; Filename: "{uninstallexe}"
+Name: "{autodesktop}\Pair Trading Pro"; Filename: "{app}\PairTradingPro.exe"
+
+[Run]
+Filename: "{app}\PairTradingPro.exe"; Description: "Launch Pair Trading Pro"; Flags: nowait postinstall skipifsilent
+```
+
+3. Compile installer:
+
+```bash
+# Mở Inno Setup và compile file .iss
+# Hoặc dùng command line:
+iscc installer.iss
+```
+
+#### Sử dụng NSIS (Nullsoft Scriptable Install System)
+
+```nsis
+; Script NSIS ví dụ
+!define APP_NAME "Pair Trading Pro"
+!define APP_VERSION "2.0.0"
+
+OutFile "installer\PairTradingPro_Setup_v2.0.0.exe"
+InstallDir "$PROGRAMFILES\${APP_NAME}"
+
+Section "Install"
+    SetOutPath $INSTDIR
+    File /r "dist\*.*"
+    File /r "config\*.*"
+    File /r "asset\*.*"
+    CreateShortCut "$DESKTOP\${APP_NAME}.lnk" "$INSTDIR\PairTradingPro.exe"
+SectionEnd
+```
+
+### Quản lý License (Tùy chọn)
+
+**Lưu ý**: Phần này chỉ áp dụng nếu bạn muốn bảo vệ phần mềm với license key.
+
+#### 1. Tạo License Key
+
+Tạo script `tools/generate_license.py`:
+
+```python
+import hashlib
+import json
+from datetime import datetime, timedelta
+from cryptography.fernet import Fernet
+
+def generate_license(customer_name, duration_days=365):
+    """
+    Tạo license key cho customer
+
+    Args:
+        customer_name: Tên khách hàng
+        duration_days: Số ngày sử dụng (mặc định 365)
+
+    Returns:
+        license_key: Mã license đã mã hóa
+    """
+    # Tạo secret key (lưu an toàn, không commit vào git)
+    secret_key = Fernet.generate_key()
+    cipher = Fernet(secret_key)
+
+    # Tạo license data
+    expiry_date = (datetime.now() + timedelta(days=duration_days)).isoformat()
+    license_data = {
+        "customer": customer_name,
+        "issued_date": datetime.now().isoformat(),
+        "expiry_date": expiry_date,
+        "version": "2.0.0",
+        "features": ["gui", "cli", "backtest", "multi-pair"]
+    }
+
+    # Mã hóa
+    encrypted = cipher.encrypt(json.dumps(license_data).encode())
+
+    return encrypted.hex(), secret_key.hex()
+
+# Sử dụng
+if __name__ == "__main__":
+    customer = input("Nhập tên khách hàng: ")
+    days = int(input("Số ngày sử dụng (mặc định 365): ") or 365)
+
+    license_key, secret = generate_license(customer, days)
+
+    print(f"\nLicense Key:\n{license_key}\n")
+    print(f"Secret Key (LƯU AN TOÀN):\n{secret}\n")
+
+    # Lưu vào file
+    with open(f"licenses/{customer}_license.txt", "w") as f:
+        f.write(f"Customer: {customer}\n")
+        f.write(f"License Key:\n{license_key}\n")
+```
+
+#### 2. Xác thực License trong App
+
+Thêm vào `core/license_manager.py`:
+
+```python
+from cryptography.fernet import Fernet
+from datetime import datetime
+import json
+
+class LicenseManager:
+    def __init__(self, secret_key):
+        self.cipher = Fernet(bytes.fromhex(secret_key))
+
+    def validate_license(self, license_key):
+        """Xác thực license key"""
+        try:
+            # Giải mã
+            decrypted = self.cipher.decrypt(bytes.fromhex(license_key))
+            license_data = json.loads(decrypted.decode())
+
+            # Kiểm tra expiry
+            expiry = datetime.fromisoformat(license_data["expiry_date"])
+            if datetime.now() > expiry:
+                return False, "License đã hết hạn"
+
+            return True, license_data
+        except Exception as e:
+            return False, f"License không hợp lệ: {str(e)}"
+
+# Sử dụng trong main app
+# license_manager = LicenseManager(SECRET_KEY)
+# valid, info = license_manager.validate_license(user_license_key)
+```
+
+#### 3. Tích hợp License Check vào App
+
+```python
+# Trong launch_gui.py hoặc main_cli.py
+from core.license_manager import LicenseManager
+import sys
+
+# Load license từ file hoặc user input
+def check_license():
+    try:
+        with open("license.dat", "r") as f:
+            license_key = f.read().strip()
+
+        manager = LicenseManager(SECRET_KEY)
+        valid, info = manager.validate_license(license_key)
+
+        if not valid:
+            print(f"License error: {info}")
+            sys.exit(1)
+
+        print(f"Licensed to: {info['customer']}")
+        print(f"Valid until: {info['expiry_date']}")
+        return True
+    except FileNotFoundError:
+        print("License file not found!")
+        sys.exit(1)
+
+# Gọi trước khi chạy app
+check_license()
+```
+
+### Tạo Package phân phối
+
+#### 1. Tạo ZIP Package
+
+```bash
+# Tạo thư mục phân phối
+mkdir -p release/PairTradingPro_v2.0.0
+
+# Copy files cần thiết
+cp dist/PairTradingPro.exe release/PairTradingPro_v2.0.0/
+cp -r config release/PairTradingPro_v2.0.0/
+cp -r asset release/PairTradingPro_v2.0.0/
+cp README.md LICENSE .env.example release/PairTradingPro_v2.0.0/
+
+# Tạo file hướng dẫn nhanh
+cat > release/PairTradingPro_v2.0.0/QUICKSTART.txt << EOF
+PAIR TRADING PRO - QUICK START GUIDE
+
+1. Copy file .env.example thành .env
+2. Chỉnh sửa .env với thông tin MT5 của bạn
+3. Chạy PairTradingPro.exe
+4. Cấu hình pairs trong GUI Settings
+5. Click Start Trading
+
+For detailed documentation, see README.md
+EOF
+
+# Nén thành zip
+cd release
+zip -r PairTradingPro_v2.0.0.zip PairTradingPro_v2.0.0/
+```
+
+#### 2. Tạo Package với Installer
+
+```bash
+# Build installer với Inno Setup
+iscc installer.iss
+
+# Kết quả: installer/PairTradingPro_Setup_v2.0.0.exe
+```
+
+### Checklist trước khi phân phối
+
+- [ ] Test executable trên máy sạch (không có Python)
+- [ ] Kiểm tra tất cả dependencies được bundle đầy đủ
+- [ ] Test license validation (nếu có)
+- [ ] Đảm bảo không có credentials trong package
+- [ ] Virus scan file .exe
+- [ ] Test installer trên nhiều phiên bản Windows
+- [ ] Chuẩn bị documentation cho end-user
+- [ ] Tạo video hướng dẫn (khuyến nghị)
+
+### Cấu trúc thư mục phân phối
+
+```
+PairTradingPro_v2.0.0/
+├── PairTradingPro.exe          # Main executable
+├── README.md                    # Documentation
+├── LICENSE                      # License file
+├── QUICKSTART.txt              # Quick start guide
+├── .env.example                # Environment template
+├── config/                     # Configuration files
+│   ├── symbols_pairs.yaml
+│   └── ...
+└── asset/                      # Assets (themes, icons)
+    ├── theme/
+    └── config/
+```
+
 ## Troubleshooting
 
 ### MT5 không kết nối được
