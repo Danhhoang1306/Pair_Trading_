@@ -108,7 +108,7 @@ pip install -e ".[viz]"
 
 ### 📋 Unified Configuration System (NEW!)
 
-Version 2.0.0 sử dụng **hệ thống config thống nhất** - Tất cả settings trong MỘT file!
+Version 2.0.0 sử dụng **hệ thống config thống nhất** 
 
 #### 1. Tạo file .env (MT5 credentials)
 
@@ -130,7 +130,7 @@ LOG_LEVEL=INFO
 DAILY_LOSS_LIMIT_PCT=10.0
 ```
 
-⚠️ **QUAN TRỌNG:** File `.env` chứa thông tin nhạy cảm, không commit vào git!
+
 
 #### 2. Cấu hình trading pairs
 
@@ -163,7 +163,7 @@ pairs:
       enable_volume_rebalancing: true   # Bật volume rebalancing
 ```
 
-**Để thêm pair mới:** Copy một pair config hiện có trong `unified.yaml`, đổi tên và symbols, sau đó save file.
+
 
 #### 3. Configuration Precedence
 
@@ -264,7 +264,7 @@ Pair trading dựa trên giả định rằng hai tài sản có tương quan s�
 2. **Tính spread**: Price1 - hedge_ratio × Price2
 3. **Chuẩn hóa spread thành Z-score**: (spread - mean) / std
 4. **Tín hiệu giao dịch**:
-   - Entry: |Z-score| > threshold (mặc định 2.0)
+   - Entry: |Z-score| > threshold (mặc định 2.0), threshold thấp nhất nên đặt = 1. Nếu đặt quá thấp sẽ có nhiều tín hiệu. nhưng có thể dẫn đến thua lỗ do spread không hồi về mean hoặc mean driff
    - Exit: |Z-score| < exit_threshold (mặc định 0.5)
 
 ### Pyramiding & Hedge Adjustment
