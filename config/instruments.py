@@ -1,5 +1,32 @@
 """
-Instrument specifications
+⚠️ DEPRECATED - Symbol specs loaded from MT5 at runtime!
+
+This file is kept for backward compatibility only.
+
+MIGRATION GUIDE:
+- OLD: from config.instruments import INSTRUMENTS
+- NEW: from config.manager import get_config
+        config = get_config()
+        symbol_spec = config.get_symbol('XAUUSD')
+
+Why the new approach is better:
+- Always in sync with broker (no hardcoded values)
+- No need to update config when broker changes specs
+- Lazy loading (only fetch symbols you actually use)
+- Automatic caching
+
+See: config/manager.py - get_symbol() method
+"""
+
+import warnings
+warnings.warn(
+    "config.instruments is deprecated. Symbol specs loaded from MT5 at runtime.",
+    DeprecationWarning,
+    stacklevel=2
+)
+
+"""
+OLD Instrument specifications
 """
 
 # Trading instruments

@@ -1,5 +1,30 @@
 """
-Simplified Trading Settings
+⚠️ DEPRECATED - Use config.manager instead!
+
+This file is kept for backward compatibility only.
+
+MIGRATION GUIDE:
+- OLD: from config.trading_settings import TradingSettingsManager
+- NEW: from config.manager import get_config
+
+The new unified config system is better:
+- All settings in one place (asset/config/unified.yaml)
+- Per-pair configuration (no more global-only)
+- Type-safe with dataclasses
+- Clear precedence: .env > YAML > defaults
+
+See: config/manager.py for the new API
+"""
+
+import warnings
+warnings.warn(
+    "config.trading_settings is deprecated. Use config.manager instead.",
+    DeprecationWarning,
+    stacklevel=2
+)
+
+"""
+OLD Simplified Trading Settings
 Single global config for ALL pairs - no duplication!
 """
 

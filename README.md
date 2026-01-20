@@ -106,46 +106,80 @@ pip install -e ".[viz]"
 
 ## Cấu hình
 
-### 1. Tạo file cấu hình
+### 📋 Unified Configuration System (NEW!)
+
+Version 2.0.0 sử dụng **hệ thống config thống nhất** - Tất cả settings trong MỘT file!
+
+#### 1. Tạo file .env (MT5 credentials)
 
 ```bash
 # Copy file mẫu
 cp .env.example .env
 ```
 
-### 2. Chỉnh sửa .env
+Chỉnh sửa `.env`:
 
 ```env
-# MT5 Configuration
-MT5_LOGIN=your_account_number
+# MT5 Configuration (REQUIRED)
+MT5_LOGIN=12345678
 MT5_PASSWORD=your_password
-MT5_SERVER=your_broker_server
+MT5_SERVER=MetaQuotes-Demo
 
-# Risk Management
-MAX_DAILY_LOSS=1000.0
-MAX_PORTFOLIO_LOSS=2000.0
-MAX_SETUP_LOSS=500.0
-
-# Trading Parameters
-INITIAL_CAPITAL=10000.0
-RISK_PER_TRADE=0.02
+# Optional overrides
+LOG_LEVEL=INFO
+DAILY_LOSS_LIMIT_PCT=10.0
 ```
 
-### 3. Cấu hình pairs trong config/
+⚠️ **QUAN TRỌNG:** File `.env` chứa thông tin nhạy cảm, không commit vào git!
 
-Chỉnh sửa file YAML trong thư mục `config/` để cấu hình các cặp giao dịch:
+#### 2. Cấu hình trading pairs
+
+**Tất cả settings** trong file: `asset/config/unified.yaml`
+
+File này sẽ được tự động tạo với defaults khi chạy lần đầu.
+
+**Ví dụ cấu hình pair:**
 
 ```yaml
-# config/crypto_pairs.yaml
 pairs:
-  - name: "BTC-ETH"
-    symbol_1: "BTCUSD"
-    symbol_2: "ETHUSD"
-    hedge_ratio: 0.05
-    z_entry: 2.0
-    z_exit: 0.5
-    lookback_period: 60
+  BTC_ETH:
+    name: BTC_ETH
+    primary_symbol: BTCUSD
+    secondary_symbol: ETHUSD
+    risk_level: HIGH
+
+    trading:
+      entry_threshold: 2.0    # Z-score để vào lệnh
+      exit_threshold: 0.5     # Z-score để thoát
+      max_positions: 10
+      volume_multiplier: 1.0
+
+    risk:
+      max_loss_per_setup_pct: 2.0      # Max 2% loss per setup
+      daily_loss_limit_pct: 10.0       # Max 10% daily loss
+
+    features:
+      enable_pyramiding: true           # Bật pyramiding
+      enable_volume_rebalancing: true   # Bật volume rebalancing
 ```
+
+**Để thêm pair mới:** Copy một pair config hiện có trong `unified.yaml`, đổi tên và symbols, sau đó save file.
+
+#### 3. Configuration Precedence
+
+Settings được load theo thứ tự ưu tiên:
+
+```
+1. .env file (Environment variables)    [CAO NHẤT]
+2. unified.yaml (Runtime config)
+3. Code defaults                         [THẤP NHẤT]
+```
+
+#### 📚 Documentation
+
+- **Quick Start:** [config/README.md](config/README.md)
+- **Migration Guide:** [docs/CONFIG_MIGRATION_GUIDE.md](docs/CONFIG_MIGRATION_GUIDE.md)
+- **Full Guide:** [UNIFIED_CONFIG_SUMMARY.md](UNIFIED_CONFIG_SUMMARY.md)
 
 ## Sử dụng
 

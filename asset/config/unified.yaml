@@ -1,0 +1,302 @@
+# ============================================================================
+# PAIR TRADING PRO - UNIFIED CONFIGURATION
+# ============================================================================
+# Version: 2.0.0
+# Format: unified_v1
+#
+# This is the SINGLE configuration file for the entire system.
+# No more fragmented configs!
+#
+# Configuration Precedence:
+# 1. Environment variables (.env file) - HIGHEST
+# 2. This YAML file
+# 3. Defaults in code - LOWEST
+#
+# MT5 credentials should be in .env file, NOT here!
+# ============================================================================
+
+version: '2.0.0'
+config_format: unified_v1
+
+# ============================================================================
+# MT5 CONNECTION
+# ============================================================================
+# NOTE: Login credentials should be in .env file for security!
+# Only non-sensitive settings here.
+mt5:
+  timeout: 60000  # Connection timeout in ms
+
+# ============================================================================
+# GLOBAL DEFAULTS
+# ============================================================================
+# These apply to ALL pairs unless overridden in pair-specific config
+
+global_defaults:
+  # Risk management defaults
+  risk:
+    max_loss_per_setup_pct: 2.0        # Max loss per setup (% of balance)
+    max_total_unrealized_loss_pct: 5.0 # Max total portfolio loss (%)
+    daily_loss_limit_pct: 10.0         # Max daily loss (%)
+    max_position_pct: 20.0             # Max position size (%)
+    max_drawdown_pct: 20.0             # Max drawdown (%)
+    max_daily_trades: 50               # Max trades per day
+    max_consecutive_losses: 5          # Max consecutive losses
+    session_start_time: '00:00'        # Session start (HH:MM)
+    session_end_time: '23:59'          # Session end (HH:MM)
+
+  # Feature flags defaults
+  features:
+    enable_pyramiding: true             # Enable pyramiding (System 2)
+    enable_volume_rebalancing: true     # Enable volume rebalancing (System 3)
+    enable_regime_filter: false         # Enable regime filtering
+    enable_entry_cooldown: true         # Enable entry cooldown
+    enable_manual_position_sync: true   # Auto-sync manual MT5 positions
+    enable_state_persistence: true      # Save positions to disk
+
+  # System defaults
+  system:
+    magic_number: 234000               # MT5 magic number
+    zscore_history_size: 200           # Z-score history size
+    position_data_dir: positions       # Position data directory
+    log_level: INFO                    # Logging level
+    timezone: UTC                      # System timezone
+
+# ============================================================================
+# TRADING PAIRS
+# ============================================================================
+# Each pair has complete configuration - no duplication!
+
+pairs:
+  # --------------------------------------------------------------------------
+  # BTC/ETH - Crypto Pair (Current Active Configuration)
+  # --------------------------------------------------------------------------
+  BTC_ETH:
+    name: BTC_ETH
+    primary_symbol: BTCUSD
+    secondary_symbol: ETHUSD
+    description: 'Bitcoin/Ethereum crypto pair - high volatility'
+    risk_level: HIGH
+
+    # Trading parameters
+    trading:
+      entry_threshold: 1.0       # ⚠️ AGGRESSIVE - Current user setting
+      exit_threshold: 0.5
+      stop_loss_zscore: 3.5
+      max_positions: 10
+      volume_multiplier: 100.0   # ⚠️ VERY HIGH - Current user setting
+
+    # Model parameters
+    model:
+      rolling_window_size: 1000
+      update_interval: 1         # 1 second - very fast
+      hedge_drift_threshold: 0.05
+      cointegration_lookback: 252
+      adf_significance: 0.05
+      min_half_life: 5
+      max_half_life: 30
+
+    # Risk parameters (overrides global defaults)
+    risk:
+      max_loss_per_setup_pct: 1.0      # Conservative for crypto
+      max_total_unrealized_loss_pct: 3.0
+      daily_loss_limit_pct: 2.0        # ⚠️ TIGHT - Current user setting
+      max_position_pct: 20.0
+      max_drawdown_pct: 20.0
+      max_daily_trades: 30
+      max_consecutive_losses: 5
+      session_start_time: '04:00'      # Current user setting
+      session_end_time: '03:59'
+
+    # Rebalancer parameters
+    rebalancer:
+      scale_interval: 0.2              # Pyramid every 0.2 z-score
+      initial_fraction: 0.33
+      min_adjustment_interval: 3600
+      volume_imbalance_threshold: 0.10
+      entry_min_time_between: 60
+
+    # Feature flags (use global defaults)
+    features:
+      enable_pyramiding: true
+      enable_volume_rebalancing: true
+      enable_regime_filter: false
+      enable_entry_cooldown: true
+      enable_manual_position_sync: true
+      enable_state_persistence: true
+
+    # System parameters (use global defaults)
+    system:
+      magic_number: 234000
+      zscore_history_size: 200
+      position_data_dir: positions
+      log_level: INFO
+      timezone: UTC
+
+    # Transaction costs
+    costs:
+      commission_per_lot: 2.50
+      spread_bps: 3.0       # Higher for crypto
+      slippage_bps: 3.0
+
+  # --------------------------------------------------------------------------
+  # XAU/XAG - Precious Metals Pair (Conservative Settings)
+  # --------------------------------------------------------------------------
+  XAU_XAG:
+    name: XAU_XAG
+    primary_symbol: XAUUSD
+    secondary_symbol: XAGUSD
+    description: 'Gold/Silver precious metals - stable correlation'
+    risk_level: LOW
+
+    # Trading parameters
+    trading:
+      entry_threshold: 2.0      # Standard threshold
+      exit_threshold: 0.5
+      stop_loss_zscore: 3.5
+      max_positions: 10
+      volume_multiplier: 1.0
+
+    # Model parameters
+    model:
+      rolling_window_size: 1000
+      update_interval: 60       # 60 seconds - normal speed
+      hedge_drift_threshold: 0.05
+      cointegration_lookback: 252
+      adf_significance: 0.05
+      min_half_life: 5
+      max_half_life: 30
+
+    # Risk parameters (conservative for metals)
+    risk:
+      max_loss_per_setup_pct: 2.0
+      max_total_unrealized_loss_pct: 5.0
+      daily_loss_limit_pct: 10.0
+      max_position_pct: 20.0
+      max_drawdown_pct: 20.0
+      max_daily_trades: 50
+      max_consecutive_losses: 5
+      session_start_time: '00:00'
+      session_end_time: '23:59'
+
+    # Rebalancer parameters
+    rebalancer:
+      scale_interval: 0.5
+      initial_fraction: 0.33
+      min_adjustment_interval: 3600
+      volume_imbalance_threshold: 0.10
+      entry_min_time_between: 60
+
+    # Feature flags (use global defaults)
+    features:
+      enable_pyramiding: true
+      enable_volume_rebalancing: true
+      enable_regime_filter: false
+      enable_entry_cooldown: true
+      enable_manual_position_sync: true
+      enable_state_persistence: true
+
+    # System parameters
+    system:
+      magic_number: 234000
+      zscore_history_size: 200
+      position_data_dir: positions
+      log_level: INFO
+      timezone: UTC
+
+    # Transaction costs
+    costs:
+      commission_per_lot: 2.50
+      spread_bps: 2.0
+      slippage_bps: 2.0
+
+  # --------------------------------------------------------------------------
+  # NAS100/SP500 - Indices Pair (Medium Risk)
+  # --------------------------------------------------------------------------
+  NAS_SP:
+    name: NAS_SP
+    primary_symbol: NAS100.r
+    secondary_symbol: SP500.r
+    description: 'NASDAQ/S&P500 indices pair'
+    risk_level: MEDIUM
+
+    # Trading parameters
+    trading:
+      entry_threshold: 2.0
+      exit_threshold: 0.5
+      stop_loss_zscore: 3.5
+      max_positions: 10
+      volume_multiplier: 1.0
+
+    # Model parameters
+    model:
+      rolling_window_size: 1000
+      update_interval: 60
+      hedge_drift_threshold: 0.05
+      cointegration_lookback: 252
+      adf_significance: 0.05
+      min_half_life: 5
+      max_half_life: 30
+
+    # Risk parameters
+    risk:
+      max_loss_per_setup_pct: 2.0
+      max_total_unrealized_loss_pct: 5.0
+      daily_loss_limit_pct: 10.0
+      max_position_pct: 20.0
+      max_drawdown_pct: 20.0
+      max_daily_trades: 50
+      max_consecutive_losses: 5
+      session_start_time: '00:00'
+      session_end_time: '23:59'
+
+    # Rebalancer parameters
+    rebalancer:
+      scale_interval: 0.5
+      initial_fraction: 0.33
+      min_adjustment_interval: 3600
+      volume_imbalance_threshold: 0.10
+      entry_min_time_between: 60
+
+    # Feature flags
+    features:
+      enable_pyramiding: true
+      enable_volume_rebalancing: true
+      enable_regime_filter: false
+      enable_entry_cooldown: true
+      enable_manual_position_sync: true
+      enable_state_persistence: true
+
+    # System parameters
+    system:
+      magic_number: 234000
+      zscore_history_size: 200
+      position_data_dir: positions
+      log_level: INFO
+      timezone: UTC
+
+    # Transaction costs
+    costs:
+      commission_per_lot: 2.50
+      spread_bps: 2.0
+      slippage_bps: 2.0
+
+# ============================================================================
+# NOTES
+# ============================================================================
+# 1. Symbol specifications (contract_size, min_lot, etc.) are loaded from
+#    MT5 at runtime - NOT stored in config!
+#
+# 2. MT5 login credentials should be in .env file:
+#    MT5_LOGIN=12345678
+#    MT5_PASSWORD=your_password
+#    MT5_SERVER=MetaQuotes-Demo
+#
+# 3. To add a new pair:
+#    - Copy one of the existing pair configs
+#    - Change name, symbols, and description
+#    - Adjust parameters as needed
+#    - Save and reload
+#
+# 4. Current active pair settings (BTC_ETH) preserve user's aggressive
+#    configuration. Use with caution!
+# ============================================================================

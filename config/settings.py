@@ -1,5 +1,31 @@
 """
-Centralized Configuration System
+⚠️ DEPRECATED - Use config.manager instead!
+
+This file is kept for backward compatibility only.
+
+MIGRATION GUIDE:
+- OLD: from config.settings import get_config
+- NEW: from config.manager import get_config
+
+The new unified config system:
+- Single YAML file (asset/config/unified.yaml)
+- No fragmentation
+- Clear precedence: .env > YAML > defaults
+- Better type safety with dataclasses
+
+See: config/manager.py, config/models.py, config/defaults.py
+"""
+
+# Legacy support - redirect to new system
+import warnings
+warnings.warn(
+    "config.settings is deprecated. Use config.manager instead.",
+    DeprecationWarning,
+    stacklevel=2
+)
+
+"""
+OLD Centralized Configuration System
 Compatible with existing trading logic, extensible for future
 """
 

@@ -196,3 +196,6 @@ asset/license/license.dat
 # Admin tools - KEEP SECURE, DO NOT DISTRIBUTE
 generate_license.py
 pair_trading_pro.rar
+
+# Cleanup script output
+cleanup.py

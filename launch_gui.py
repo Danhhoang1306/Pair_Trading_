@@ -186,13 +186,19 @@ def main():
     print("=" * 70)
     print("")
 
-    # Step 1: Initialize simplified settings system
-    from config.trading_settings import TradingSettingsManager
-    print("Step 1: Loading Trading Settings...")
-    settings_manager = TradingSettingsManager()
+    # Step 1: Initialize unified configuration system
+    from config.manager import get_config
+    print("Step 1: Loading Configuration (Unified System)...")
+    config_manager = get_config()
+
+    # Display loaded configuration
+    pairs = config_manager.get_all_pairs()
+    print(f"  Loaded {len(pairs)} trading pairs:")
+    for name, pair in pairs.items():
+        print(f"    - {name}: {pair.primary_symbol}/{pair.secondary_symbol} ({pair.risk_level})")
     print("")
 
-    # Step 2: Launch GUI with loaded configuration
+    # Step 2: Launch GUI with unified configuration
     print("Step 2: Starting GUI...")
 
     from gui.main_window_integrated import main as gui_main

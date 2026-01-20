@@ -103,10 +103,19 @@ class TradingSystem:
         # Store config
         self.config = config or {}
 
-        # ========== RISK CONFIG (NEW) ==========
+        # ========== RISK CONFIG (NEW - UNIFIED) ==========
         # Create RiskConfig with backward compatibility
-        from config.settings import RiskConfig
-        self.risk_config = RiskConfig.from_dict(self.config)
+        from config.models import RiskParameters
+        # Support both old dict and new dataclass
+        if isinstance(self.config, dict):
+            self.risk_config = RiskParameters(**{
+                k: v for k, v in self.config.items()
+                if k in RiskParameters.__dataclass_fields__
+            })
+        elif hasattr(self.config, 'risk'):
+            self.risk_config = self.config.risk
+        else:
+            self.risk_config = RiskParameters()
 
         # Log risk limits
         logger.info("="*80)
@@ -694,9 +703,10 @@ def signal_handler(signum, frame):
     sys.exit(0)
 
 
-@require_license
 def main():
     """Main entry point"""
+    # Check license first
+    require_license()
 
     print("""
 
@@ -729,53 +739,37 @@ def main():
     logger.info("MT5 CONNECTION READY - Proceeding with system initialization")
     logger.info("=" * 80)
     
-    # Create complete config for CLI mode - ALL parameters from config!
-    from config.settings import PairConfig
+    # ========== LOAD CONFIGURATION (UNIFIED SYSTEM) ==========
+    from config.manager import get_config
+
+    config_manager = get_config()
+
+    # Get pair configuration from unified.yaml
+    # Default to BTC_ETH pair (or whichever pair user configured)
+    pair_name = "BTC_ETH"  # Can be overridden via CLI args
+    cli_config = config_manager.get_pair(pair_name)
+
+    if cli_config is None:
+        logger.critical(f"=" * 80)
+        logger.critical(f"ERROR: Pair '{pair_name}' not found in configuration!")
+        logger.critical(f"Available pairs: {list(config_manager.get_all_pairs().keys())}")
+        logger.critical(f"=" * 80)
+        logger.critical(f"Please check asset/config/unified.yaml")
+        sys.exit(1)
+
+    logger.info("=" * 80)
+    logger.info(f"CONFIGURATION LOADED - {pair_name}")
+    logger.info("=" * 80)
+    logger.info(f"  Symbols: {cli_config.primary_symbol}/{cli_config.secondary_symbol}")
+    logger.info(f"  Entry threshold: {cli_config.trading.entry_threshold}")
+    logger.info(f"  Risk level: {cli_config.risk_level}")
+    logger.info("=" * 80)
     
-    cli_config = PairConfig(
-        name="XAU_XAG_CLI",
-        primary_symbol="BTCUSD",
-        secondary_symbol="ETHUSD",
-        
-        # Trading parameters
-        entry_threshold=2.0,
-        exit_threshold=0.5,
-        stop_loss_zscore=3.5,
-        max_positions=3,
-        volume_multiplier=1.0,
-        
-        # Model parameters
-        rolling_window_size=1000,
-        update_interval=60,
-        hedge_drift_threshold=0.05,
-
-        # Risk parameters
-        max_position_pct=20.0,
-        max_risk_pct=2.0,
-        max_drawdown_pct=20.0,
-        daily_loss_limit=5000.0,
-
-        # Rebalancer parameters - NO MORE HARDCODED!
-        scale_interval=0.1,
-        initial_fraction=0.33,
-        min_adjustment_interval=3600,
-
-        # Feature flags
-        enable_pyramiding=True,
-        enable_hedge_adjustment=True,
-        enable_regime_filter=False,
-
-        # System parameters - NO MORE HARDCODED!
-        magic_number=234000,
-        zscore_history_size=200,
-        position_data_dir="positions"
-    )
-    
-    logger.info("Using CLI config:")
-    logger.info(f"  Pair: {cli_config.primary_symbol}/{cli_config.secondary_symbol}")
-    logger.info(f"  Entry: {cli_config.entry_threshold}, Max Positions: {cli_config.max_positions}")
-    logger.info(f"  Scale Interval: {cli_config.scale_interval}, Initial Fraction: {cli_config.initial_fraction}")
-    logger.info(f"  Magic Number: {cli_config.magic_number}")
+    logger.info("Configuration Details:")
+    logger.info(f"  Entry: {cli_config.trading.entry_threshold}, Max Positions: {cli_config.trading.max_positions}")
+    logger.info(f"  Scale Interval: {cli_config.rebalancer.scale_interval}, Initial Fraction: {cli_config.rebalancer.initial_fraction}")
+    logger.info(f"  Magic Number: {cli_config.system.magic_number}")
+    logger.info(f"  Pyramiding: {cli_config.features.enable_pyramiding}, Rebalancing: {cli_config.features.enable_volume_rebalancing}")
     
     global system
     system = TradingSystem(

@@ -1,5 +1,32 @@
 """
-Risk management limits and parameters
+⚠️ DEPRECATED - Use config.manager instead!
+
+This file is kept for backward compatibility only.
+
+MIGRATION GUIDE:
+- OLD: from config.risk_limits import RISK_LIMITS, STRATEGY_PARAMS
+- NEW: from config.manager import get_config
+        config = get_config()
+        risk = config.get_pair('BTC_ETH').risk
+
+The new unified config system provides:
+- Per-pair risk configuration
+- Type-safe dataclasses
+- Better validation
+- Single YAML file
+
+See: config/manager.py, config/models.py
+"""
+
+import warnings
+warnings.warn(
+    "config.risk_limits is deprecated. Use config.manager instead.",
+    DeprecationWarning,
+    stacklevel=2
+)
+
+"""
+OLD Risk management limits and parameters
 """
 
 # Strategy parameters
